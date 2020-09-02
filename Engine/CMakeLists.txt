@@ -10,4 +10,6 @@ add_library (engine "Engine.cpp")
 
 target_include_directories(engine PUBLIC include)
 
+include_directories(deps/SDL)
+
 # TODO: Add tests and install targets if needed.
