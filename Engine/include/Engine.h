@@ -9,6 +9,7 @@ class Entity {};
 
 class DrawableEntity {
 public:
+    void draw(Canvas& canvas);
 
 };
 
@@ -32,9 +33,14 @@ public:
 	void register_entity(std::shared_ptr<Entity> entity);
 	void remove_entity(std::shared_ptr<Entity> entity);
 
+    void register_drawable_entity(std::shared_ptr<DrawableEntity> entity);
+    void remove_drawable_entity(std::shared_ptr<DrawableEntity> entity);
+
 	void run_main_loop();
 
 private:
 	std::set<std::shared_ptr<Entity>> living_entities;
+	std::set<std::shared_ptr<DrawableEntity>> drawable_entities;
+
     std::unique_ptr<Canvas> canvas;
 };

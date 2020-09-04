@@ -46,9 +46,32 @@ void Engine::remove_entity(std::shared_ptr<Entity> entity)
 	this->living_entities.erase(entity_to_remove);
 }
 
+void Engine::register_drawable_entity(std::shared_ptr<DrawableEntity> entity)
+{
+	this->drawable_entities.insert(entity);
+}
+
+void Engine::remove_drawable_entity(std::shared_ptr<DrawableEntity> entity)
+{
+	auto entity_to_remove = this->drawable_entities.find(entity);
+	this->drawable_entities.erase(entity_to_remove);
+}
+
 void Engine::run_main_loop()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		std::cout << "SDL_Init error" << SDL_GetError() << std::endl;
+	}
+
+	while (true) {
+		this->canvas->clear();
+
+		for (auto drawableEntityIterator = begin(this->drawable_entities);
+				drawableEntityIterator != end(this->drawable_entities);
+				++drawableEntityIterator) {
+			(*drawableEntityIterator)->draw(*(this->canvas));
+		}
+
+		this->canvas->blip();
 	}
 }
