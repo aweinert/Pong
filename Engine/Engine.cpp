@@ -5,16 +5,20 @@
 using namespace std;
 
 Canvas::Canvas(int width, int height) :
-	width(width),
-	height(height),
-	window(std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>(SDL_CreateWindow("SDL Window", 100, 100, width, height, SDL_WINDOW_SHOWN), SDL_DestroyWindow)),
-	renderer(std::shared_ptr<SDL_Renderer>(SDL_CreateRenderer(this->window.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC), SDL_DestroyRenderer))
+	window(std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>(SDL_CreateWindow("SDL Window", 100, 100, width, height, SDL_WINDOW_SHOWN), SDL_DestroyWindow))
 {
+	this->width = width;
+	this->height = height;
+	this->renderer = std::shared_ptr<SDL_Renderer>(SDL_CreateRenderer(this->window.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC), SDL_DestroyRenderer);
 }
 
 void Canvas::clear()
 {
-	SDL_RenderClear(this->renderer.get());
+	SDL_SetRenderDrawColor(this->renderer.get(), 0x00, 0x00, 0x00, 0xFF);
+
+	if (SDL_RenderClear(this->renderer.get()) != 0) {
+		std::cout << "SDL_RenderClear error" << SDL_GetError() << std::endl;
+	}
 }
 
 void Canvas::draw_line(int xStart, int yStart, int xEnd, int yEnd, int r, int g, int b, int alpha)
@@ -30,8 +34,7 @@ void Canvas::blip()
 	SDL_RenderPresent(this->renderer.get());
 }
 
-Engine::Engine() :
-	canvas(auto_ptr<Canvas>(new Canvas(640, 480)))
+Engine::Engine()
 {
 }
 
@@ -63,7 +66,18 @@ void Engine::run_main_loop()
 		std::cout << "SDL_Init error" << SDL_GetError() << std::endl;
 	}
 
-	while (true) {
+	this->canvas = new Canvas(640, 480);
+
+	bool quit_requested = false;
+
+	while (!quit_requested) {
+		SDL_Event event;
+		while (SDL_PollEvent(&event) != 0) {
+			if (event.type == SDL_QUIT) {
+				quit_requested = true;
+			}
+		}
+
 		this->canvas->clear();
 
 		for (auto drawableEntityIterator = begin(this->drawable_entities);
@@ -73,5 +87,7 @@ void Engine::run_main_loop()
 		}
 
 		this->canvas->blip();
+
+		SDL_Delay(0);
 	}
 }

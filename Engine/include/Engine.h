@@ -7,12 +7,6 @@
 
 class Entity {};
 
-class DrawableEntity {
-public:
-    void draw(Canvas& canvas);
-
-};
-
 class Canvas {
 public:
     Canvas(int width, int height);
@@ -25,6 +19,12 @@ private:
     int width, height;
     std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window;
     std::shared_ptr<SDL_Renderer> renderer;
+};
+
+class DrawableEntity {
+public:
+    virtual void draw(Canvas& canvas) = 0;
+
 };
 
 class Engine {
@@ -42,5 +42,5 @@ private:
 	std::set<std::shared_ptr<Entity>> living_entities;
 	std::set<std::shared_ptr<DrawableEntity>> drawable_entities;
 
-    std::unique_ptr<Canvas> canvas;
+    Canvas* canvas;
 };
